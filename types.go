@@ -18,16 +18,17 @@ type Place struct {
 type Room struct {
 	name        string
 	characters  []Character
-	onEnter     func(room Room)
+	onEnter     func(state State) State
 	description string
 	firstEnter  bool
 }
 
 //Character is
 type Character struct {
-	name   string
-	items  []Item
-	roomID string
+	name    string
+	items   []Item
+	roomID  string
+	taskIDs []string
 }
 
 //Verb is
@@ -43,10 +44,11 @@ type State struct {
 	characters []Character
 	verbs      []Verb
 	player     Character
+	tasks      []Task
 }
 
-//Node is
-type Node struct {
+//Task is
+type Task struct {
 	id                string
 	nextID            string
 	successConditions []Condition

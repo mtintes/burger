@@ -8,5 +8,6 @@ func createPlayer(state State) Character {
 	hat, _ := findItemByID("hat", state)
 	player.items = addItemToInventory(hat, player.items)
 	player.roomID = "kitchen"
+	player.taskIDs = []string{"action1"}
 	return player
 }

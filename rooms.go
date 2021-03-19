@@ -20,28 +20,34 @@ func createRooms(state State) []Room {
 		onEnter:     enterLivingRoom,
 		description: "The living room looks dated... The couch is plaid and wrapped in plastic. There is an endtable with a candy dish on it."})
 
+	roomsToReturn = append(roomsToReturn, Room{
+		name:        "outside",
+		firstEnter:  true,
+		onEnter:     enterOutside,
+		description: "It is a warm day. You can feel the sun on your face.",
+	})
 	// roomToAdd, _ := findRoomByID("kitchen", roomsToReturn)
 	// roomsToReturn = addCharacterToRoom(state.player, roomToAdd, roomsToReturn)
 	return roomsToReturn
 }
 
-func addCharacterToRoom(characterToAdd Character, roomToAddCharacter Room, rooms []Room) []Room {
+// func addCharacterToRoom(characterToAdd Character, roomToAddCharacter Room, rooms []Room) []Room {
 
-	var newRooms []Room
+// 	var newRooms []Room
 
-	for _, room := range rooms {
-		if room.name == roomToAddCharacter.name {
-			room.characters = append(room.characters, characterToAdd)
-			room.onEnter(room)
-			newRooms = append(newRooms, room)
-		} else {
-			newRooms = append(newRooms, room)
-		}
-	}
+// 	for _, room := range rooms {
+// 		if room.name == roomToAddCharacter.name {
+// 			room.characters = append(room.characters, characterToAdd)
+// 			room.onEnter(state)
+// 			newRooms = append(newRooms, room)
+// 		} else {
+// 			newRooms = append(newRooms, room)
+// 		}
+// 	}
 
-	return newRooms
+// 	return newRooms
 
-}
+// }
 
 func addRoomToCharacter(roomID string, state State) Character {
 	state.player.roomID = roomID
@@ -77,7 +83,7 @@ func findRoomByID(roomIdToFind string, rooms []Room) (Room, error) {
 		}
 	}
 
-	return Room{name: "none"}, errors.New("No Item Found")
+	return Room{name: "none"}, errors.New("No Room Found")
 }
 
 func markRoomAsEntered(roomID string, rooms []Room) []Room {
@@ -96,12 +102,20 @@ func markRoomAsEntered(roomID string, rooms []Room) []Room {
 
 //On Enters Functions
 
-func enterKitchen(room Room) {
-	fmt.Println(room.description)
+func enterKitchen(state State) State {
+	fmt.Printf("first enter %s\n", state.player.roomID)
 	//do something else
+	return state
 }
 
-func enterLivingRoom(room Room) {
-	fmt.Println(room.description)
+func enterLivingRoom(state State) State {
+	fmt.Printf("first enter %s\n", state.player.roomID)
 	//do something else
+	return state
+}
+
+func enterOutside(state State) State {
+	fmt.Printf("first enter %s\n", state.player.roomID)
+	//do something else
+	return state
 }

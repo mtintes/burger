@@ -48,18 +48,23 @@ func processCommand(command string, state State) State {
 	} else if verb == "inventory" {
 		fmt.Println(state.player.items)
 	} else if verb == "go" && objectType == "room" {
-		fmt.Println("add player")
-		state.player = addRoomToCharacter(objectName, state)
-		// roomToLeave, _ := findRoomByID(state.Player., state)
-		roomToGo, _ := findRoomByID(objectName, state.rooms)
-		if roomToGo.firstEnter {
-			roomToGo.onEnter(roomToGo)
-		}
+		roomToGo, error := findRoomByID(objectName, state.rooms)
+		if error != nil {
+			fmt.Printf("There is not room available called %s", objectName)
+		} else if state.player.roomID == objectName {
+			fmt.Printf("You are already in the %s\n", objectName)
+		} else {
+			state.player = addRoomToCharacter(objectName, state)
 
-		state.rooms = markRoomAsEntered(objectName, state.rooms)
-		// fmt.Println("remove player")
-		// state.rooms = removeCharacterFromRoom(state.player, state.rooms)
-		// state.rooms = addCharacterToRoom(state.player, roomToGo, state.rooms)
+			if roomToGo.firstEnter {
+				state = roomToGo.onEnter(state)
+			}
+
+			state.rooms = markRoomAsEntered(objectName, state.rooms)
+			// fmt.Println("remove player")
+			// state.rooms = removeCharacterFromRoom(state.player, state.rooms)
+			// state.rooms = addCharacterToRoom(state.player, roomToGo, state.rooms)
+		}
 	} else if verb == "where" {
 		fmt.Println(state.player.roomID)
 	} else if verb == "describe" {
@@ -67,21 +72,8 @@ func processCommand(command string, state State) State {
 		fmt.Println(roomToDescribe.description)
 	}
 
-	//take order
-	//start grill
-	//get hamburger patty
-	//put hamburger patty on grill
-	//get bun
-	//put bun on grill
-	//get cheese slice
-	//put cheese on hamburger patty
-	//get plate
-	//set down plate
-	//put bun on plate
-	//take hamburger patty from grill
-	//put hamburger patty on bun
-	//put onions on hamburger patty
-	//put ketchup on hamburger patty
+	state = checkTasks(state)
+
 	return state
 }
 
@@ -123,7 +115,7 @@ func setUp() State {
 	state.verbs = createVerbs()
 	state.player = createPlayer(state)
 	state.rooms = createRooms(state)
-	// characters = createCharacters()
+	state.tasks = createTasks(state)
 
 	return state
 }
@@ -131,20 +123,3 @@ func setUp() State {
 // func createCharacters() []Character {
 
 // }
-
-func createNodes(state State) []Node {
-	return []Node{
-		{
-			id:     "action1",
-			nextID: "action2",
-			successConditions: []Condition{
-				{
-					completed: false,
-					statement: func(state State) bool {
-						return state.player.roomID == "living room"
-					},
-				},
-			},
-		},
-	}
-}
