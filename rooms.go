@@ -83,7 +83,7 @@ func findRoomByID(roomIdToFind string, rooms []Room) (Room, error) {
 		}
 	}
 
-	return Room{name: "none"}, errors.New("No Room Found")
+	return Room{name: "none"}, errors.New("NOT_FOUND")
 }
 
 func markRoomAsEntered(roomID string, rooms []Room) []Room {

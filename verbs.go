@@ -36,6 +36,10 @@ func createVerbs() []Verb {
 			primary: "describe",
 			aliases: []string{"describe", "description"},
 		},
+		{
+			primary: "tasks",
+			aliases: []string{"tasks", "task"},
+		},
 	}
 }
 

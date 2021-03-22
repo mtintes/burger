@@ -70,6 +70,8 @@ func processCommand(command string, state State) State {
 	} else if verb == "describe" {
 		roomToDescribe, _ := findRoomByID(state.player.roomID, state.rooms)
 		fmt.Println(roomToDescribe.description)
+	} else if verb == "tasks" {
+		fmt.Println(state.player.taskIDs)
 	}
 
 	state = checkTasks(state)
