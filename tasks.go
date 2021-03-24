@@ -2,7 +2,6 @@ package main
 
 import (
 	"errors"
-	"fmt"
 )
 
 func nextTask(currentTask Task, tasks []Task) Task {
@@ -28,40 +27,46 @@ func getTask(taskID string, state State) (Task, error) {
 func createTasks(state State) []Task {
 	return []Task{
 		{
-			id:     "action1",
-			nextID: "action2",
-			successConditions: []Condition{
-				{
-					completed: false,
-					statement: func(state State) bool {
-						return state.player.roomID == "living room"
-					},
+			id:     "t1a1",
+			nextID: "t1a2",
+			successCondition: Condition{
+				completed:   false,
+				description: "Enter the living room.",
+				statement: func(state State) bool {
+					return state.player.roomID == "living room"
 				},
 			},
 		},
 		{
-			id:     "action2",
-			nextID: "action3",
-			successConditions: []Condition{
-				{
-					completed: false,
-					statement: func(state State) bool {
-						fmt.Println("You walked into the kitchen")
-						return state.player.roomID == "kitchen"
-					},
-				},
-			},
-		},
-		{
-			id:     "action3",
+			id:     "t1a2",
 			nextID: "complete",
-			successConditions: []Condition{
-				{
-					completed: false,
-					statement: func(state State) bool {
-						fmt.Println("You need another item")
-						return len(state.player.items) > 2
-					},
+			successCondition: Condition{
+				completed:   false,
+				description: "Enter the kitchen",
+				statement: func(state State) bool {
+					return state.player.roomID == "kitchen"
+				},
+			},
+		},
+		{
+			id:     "t2a1",
+			nextID: "t2a2",
+			successCondition: Condition{
+				completed:   false,
+				description: "Pick up more than 1 item",
+				statement: func(state State) bool {
+					return len(state.player.items) > 1
+				},
+			},
+		},
+		{
+			id:     "t2a2",
+			nextID: "complete",
+			successCondition: Condition{
+				completed:   false,
+				description: "Pick up more than 2 items",
+				statement: func(state State) bool {
+					return len(state.player.items) > 2
 				},
 			},
 		},
@@ -87,18 +92,17 @@ func checkTasks(state State) State {
 
 func checkTask(taskID string, state State) string {
 
-	fmt.Println("TaskToCheck:", taskID)
+	// fmt.Println("TaskToCheck:", taskID)
 	var taskToCheck, _ = getTask(taskID, state)
+	// fmt.Println(taskToCheck)
 
-	for _, condition := range taskToCheck.successConditions {
-		if condition.statement(state) {
-			fmt.Println("You did a thing")
+	if taskToCheck.successCondition.statement(state) {
+		// fmt.Println("You did a thing")
+		if taskToCheck.nextID != "complete" {
 			return checkTask(taskToCheck.nextID, state)
-			// update the task list to the new task
-		} else {
-			return taskID
 		}
+		// update the task list to the new task
 	}
+	return taskID
 
-	return ""
 }

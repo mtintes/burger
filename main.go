@@ -54,16 +54,18 @@ func processCommand(command string, state State) State {
 		} else if state.player.roomID == objectName {
 			fmt.Printf("You are already in the %s\n", objectName)
 		} else {
-			state.player = addRoomToCharacter(objectName, state)
+			if isRoomAvailable(objectName, state) {
+				state = addRoomToCharacter(objectName, state)
 
-			if roomToGo.firstEnter {
-				state = roomToGo.onEnter(state)
+				if roomToGo.firstEnter {
+					state = roomToGo.onEnter(state)
+				}
+
+				state.rooms = markRoomAsEntered(objectName, state.rooms)
+			} else {
+				fmt.Printf("You are not able to travel to %s\n", objectName)
 			}
 
-			state.rooms = markRoomAsEntered(objectName, state.rooms)
-			// fmt.Println("remove player")
-			// state.rooms = removeCharacterFromRoom(state.player, state.rooms)
-			// state.rooms = addCharacterToRoom(state.player, roomToGo, state.rooms)
 		}
 	} else if verb == "where" {
 		fmt.Println(state.player.roomID)
@@ -71,7 +73,11 @@ func processCommand(command string, state State) State {
 		roomToDescribe, _ := findRoomByID(state.player.roomID, state.rooms)
 		fmt.Println(roomToDescribe.description)
 	} else if verb == "tasks" {
-		fmt.Println(state.player.taskIDs)
+		for _, task := range state.player.taskIDs {
+			var fullTask, _ = getTask(task, state)
+			fmt.Println(fullTask.successCondition.description)
+		}
+		// fmt.Println(state.player.taskIDs)
 	}
 
 	state = checkTasks(state)
@@ -81,7 +87,6 @@ func processCommand(command string, state State) State {
 
 func findObject(command string, state State) (objectName string, objectType string) {
 
-	// fmt.Printf("finding Object from: %v\n", command)
 	for _, item := range state.items {
 		for _, alias := range item.Aliases {
 			if strings.Contains(command, alias) {

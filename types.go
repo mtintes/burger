@@ -16,11 +16,14 @@ type Place struct {
 
 // Room is a space that a character can go. ex. kitchen or hallway
 type Room struct {
-	name        string
-	characters  []Character
-	onEnter     func(state State) State
-	description string
-	firstEnter  bool
+	name           string
+	characters     []Character
+	onEnter        func(state State) State
+	description    string
+	firstEnter     bool
+	connectedRooms []string
+	items          []Item
+	available      bool
 }
 
 //Character is
@@ -49,15 +52,16 @@ type State struct {
 
 //Task is
 type Task struct {
-	id                string
-	nextID            string
-	successConditions []Condition
+	id               string
+	nextID           string
+	successCondition Condition
 }
 
 //Condition is
 type Condition struct {
-	completed bool
-	statement func(state State) bool
+	completed   bool
+	description string
+	statement   func(state State) bool
 }
 
 // // Room is

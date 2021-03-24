@@ -9,22 +9,30 @@ func createRooms(state State) []Room {
 
 	var roomsToReturn []Room
 	roomsToReturn = append(roomsToReturn, Room{
-		name:        "kitchen",
-		firstEnter:  true,
-		onEnter:     enterKitchen,
-		description: "The kitchen is pretty clean. It looks like there is a stove a microwave on a checkered floor."})
+		name:           "kitchen",
+		firstEnter:     true,
+		onEnter:        enterKitchen,
+		description:    "The kitchen is pretty clean. It looks like there is a stove a microwave on a checkered floor.",
+		available:      true,
+		connectedRooms: []string{"living room"},
+	})
 
 	roomsToReturn = append(roomsToReturn, Room{
-		name:        "living room",
-		firstEnter:  true,
-		onEnter:     enterLivingRoom,
-		description: "The living room looks dated... The couch is plaid and wrapped in plastic. There is an endtable with a candy dish on it."})
+		name:           "living room",
+		firstEnter:     true,
+		onEnter:        enterLivingRoom,
+		description:    "The living room looks dated... The couch is plaid and wrapped in plastic. There is an endtable with a candy dish on it.",
+		available:      false,
+		connectedRooms: []string{"kitchen", "outside"},
+	})
 
 	roomsToReturn = append(roomsToReturn, Room{
-		name:        "outside",
-		firstEnter:  true,
-		onEnter:     enterOutside,
-		description: "It is a warm day. You can feel the sun on your face.",
+		name:           "outside",
+		firstEnter:     true,
+		onEnter:        enterOutside,
+		description:    "It is a warm day. You can feel the sun on your face.",
+		available:      false,
+		connectedRooms: []string{"living room"},
 	})
 	// roomToAdd, _ := findRoomByID("kitchen", roomsToReturn)
 	// roomsToReturn = addCharacterToRoom(state.player, roomToAdd, roomsToReturn)
@@ -49,9 +57,39 @@ func createRooms(state State) []Room {
 
 // }
 
-func addRoomToCharacter(roomID string, state State) Character {
+func addRoomToCharacter(roomID string, state State) State {
+
+	var updatedRooms []Room
+
+	for _, room := range state.rooms {
+		if room.name == roomID {
+			room.available = true
+		}
+		updatedRooms = append(updatedRooms, room)
+	}
+
+	state.rooms = updatedRooms
 	state.player.roomID = roomID
-	return state.player
+	return state
+}
+
+func isRoomAvailable(roomID string, state State) bool {
+
+	playerRoom, _ := findRoomByID(state.player.roomID, state.rooms)
+
+	for _, connectedRoom := range playerRoom.connectedRooms {
+		if roomID == connectedRoom {
+			return true
+		}
+	}
+
+	room, error := findRoomByID(roomID, state.rooms)
+	// fmt.Printf("room: %s\navailable:%v\n", room.name, room.available)
+	if error == nil {
+		return room.available
+	}
+
+	return false
 }
 
 //do we want this to look up the room that the chracter is in OR do we make that a seperate action.
@@ -101,21 +139,20 @@ func markRoomAsEntered(roomID string, rooms []Room) []Room {
 }
 
 //On Enters Functions
-
 func enterKitchen(state State) State {
-	fmt.Printf("first enter %s\n", state.player.roomID)
+	fmt.Printf("You entered the %s for the first time.\n", state.player.roomID)
 	//do something else
 	return state
 }
 
 func enterLivingRoom(state State) State {
-	fmt.Printf("first enter %s\n", state.player.roomID)
+	fmt.Printf("You entered the %s for the first time.\n", state.player.roomID)
 	//do something else
 	return state
 }
 
 func enterOutside(state State) State {
-	fmt.Printf("first enter %s\n", state.player.roomID)
+	fmt.Printf("You went %s for the first time.\n", state.player.roomID)
 	//do something else
 	return state
 }
