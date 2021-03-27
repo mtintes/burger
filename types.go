@@ -1,10 +1,16 @@
 package main
 
+// ItemDefinition is
+type ItemDefinition struct {
+	name    string
+	aliases []string
+	effect  func(state State) State
+}
+
 // Item is
 type Item struct {
-	Name    string
-	Aliases []string
-	Amount  int
+	name   string
+	amount int
 }
 
 // Place is a space in a room that a character can go. ex. cabinets(space) in a kitchen(room) or drawers(space) in a bedroom(room)
@@ -42,12 +48,12 @@ type Verb struct {
 
 //State is
 type State struct {
-	rooms      []Room
-	items      []Item
-	characters []Character
-	verbs      []Verb
-	player     Character
-	tasks      []Task
+	rooms            []Room
+	itemsDefinitions []ItemDefinition
+	characters       []Character
+	verbs            []Verb
+	player           Character
+	tasks            []Task
 }
 
 //Task is

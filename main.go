@@ -39,12 +39,14 @@ func processCommand(command string, state State) State {
 	if verb == "quit" {
 		os.Exit(0)
 	} else if verb == "get" && objectType == "item" {
-		item, _ := findItemByID(objectName, state)
-		state.player.items = addItemToInventory(item, state.player.items)
-		// state.player.items = append(state.player.items, item)
+		if isItemAvailable(objectName, state) {
+			state.player.items = addItemToInventory(Item{name: objectName, amount: 1}, state.player.items)
+		} else {
+			fmt.Printf("%s is not available to pickup.\n", objectName)
+		}
 	} else if verb == "put" && objectType == "item" {
-		item, _ := findItemByID(objectName, state)
-		state.player.items = RemoveItemFromInventory(item, state.player.items)
+		// item, _ := findItemByID(objectName, state)
+		state.player.items = removeItemFromInventory(Item{name: objectName, amount: 1}, state.player.items)
 	} else if verb == "inventory" {
 		fmt.Println(state.player.items)
 	} else if verb == "go" && objectType == "room" {
@@ -65,8 +67,10 @@ func processCommand(command string, state State) State {
 			} else {
 				fmt.Printf("You are not able to travel to %s\n", objectName)
 			}
-
 		}
+	} else if verb == "go" {
+		fmt.Println("That location is not available.")
+
 	} else if verb == "where" {
 		fmt.Println(state.player.roomID)
 	} else if verb == "describe" {
@@ -87,11 +91,11 @@ func processCommand(command string, state State) State {
 
 func findObject(command string, state State) (objectName string, objectType string) {
 
-	for _, item := range state.items {
-		for _, alias := range item.Aliases {
+	for _, item := range state.itemsDefinitions {
+		for _, alias := range item.aliases {
 			if strings.Contains(command, alias) {
 				// fmt.Printf("found: %v\n", item.Name)
-				return item.Name, "item"
+				return item.name, "item"
 			}
 		}
 	}
@@ -114,11 +118,15 @@ func findObject(command string, state State) (objectName string, objectType stri
 
 }
 
+// func findAmount(command string, state State) int {
+
+// }
+
 func setUp() State {
 
 	var state State
 
-	state.items = createItems()
+	state.itemsDefinitions = createItems()
 	state.verbs = createVerbs()
 	state.player = createPlayer(state)
 	state.rooms = createRooms(state)

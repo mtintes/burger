@@ -15,6 +15,8 @@ func createRooms(state State) []Room {
 		description:    "The kitchen is pretty clean. It looks like there is a stove a microwave on a checkered floor.",
 		available:      true,
 		connectedRooms: []string{"living room"},
+		items: []Item{
+			{name: "hamburger patty", amount: 1}},
 	})
 
 	roomsToReturn = append(roomsToReturn, Room{
@@ -24,6 +26,7 @@ func createRooms(state State) []Room {
 		description:    "The living room looks dated... The couch is plaid and wrapped in plastic. There is an endtable with a candy dish on it.",
 		available:      false,
 		connectedRooms: []string{"kitchen", "outside"},
+		items:          []Item{},
 	})
 
 	roomsToReturn = append(roomsToReturn, Room{
@@ -33,6 +36,7 @@ func createRooms(state State) []Room {
 		description:    "It is a warm day. You can feel the sun on your face.",
 		available:      false,
 		connectedRooms: []string{"living room"},
+		items:          []Item{},
 	})
 	// roomToAdd, _ := findRoomByID("kitchen", roomsToReturn)
 	// roomsToReturn = addCharacterToRoom(state.player, roomToAdd, roomsToReturn)
@@ -113,10 +117,10 @@ func removeCharacterFromRoom(characterToRemove Character, rooms []Room) []Room {
 
 }
 
-func findRoomByID(roomIdToFind string, rooms []Room) (Room, error) {
+func findRoomByID(roomIDToFind string, rooms []Room) (Room, error) {
 
 	for _, room := range rooms {
-		if room.name == roomIdToFind {
+		if room.name == roomIDToFind {
 			return room, nil
 		}
 	}

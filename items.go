@@ -1,20 +1,23 @@
 package main
 
-import "errors"
+import (
+	"errors"
+	"fmt"
+)
 
-func createItems() []Item {
-	return []Item{
+func createItems() []ItemDefinition {
+	return []ItemDefinition{
 		{
-			Name:    "hamburger patty",
-			Aliases: []string{"burger", "hamburger", "patty", "hamburger patty", "burgers", "patties", "hamburgers"},
+			name:    "hamburger patty",
+			aliases: []string{"burger", "hamburger", "patty", "hamburger patty", "burgers", "patties", "hamburgers"},
 		},
 		{
-			Name:    "bun",
-			Aliases: []string{"bun", "bread"},
+			name:    "bun",
+			aliases: []string{"bun", "bread"},
 		},
 		{
-			Name:    "hat",
-			Aliases: []string{"hat"},
+			name:    "hat",
+			aliases: []string{"hat"},
 		},
 	}
 }
@@ -22,52 +25,68 @@ func createItems() []Item {
 func addItemToInventory(itemToAdd Item, items []Item) []Item {
 	var alreadyHasItem = false
 
-	var newItems []Item
-	// fmt.Printf("looking for: %v\n", itemToAdd.Name)
+	var updatedItems []Item
 	for _, item := range items {
-		// fmt.Printf("looked at %v\n", item.Name)
-		if item.Name == itemToAdd.Name {
+		if item.name == itemToAdd.name {
 			alreadyHasItem = true
-			newItem := Item{Name: item.Name, Aliases: item.Aliases, Amount: item.Amount + 1}
-			newItems = append(newItems, newItem)
+			updatedItem := Item{name: item.name, amount: item.amount + itemToAdd.amount}
+			updatedItems = append(updatedItems, updatedItem)
 		} else {
-			newItems = append(newItems, item)
+			updatedItems = append(updatedItems, item)
 		}
 	}
 
 	if alreadyHasItem == false {
-		itemToAdd.Amount = 1
-		newItems = append(newItems, itemToAdd)
+		itemToAdd.amount = 1
+		updatedItems = append(updatedItems, itemToAdd)
 	}
 
-	return newItems
+	return updatedItems
 }
 
-func RemoveItemFromInventory(itemToRemove Item, items []Item) []Item {
-	var newItems []Item
+func isItemAvailable(itemID string, state State) bool {
+	fmt.Println(itemID)
+	room, _ := findRoomByID(state.player.roomID, state.rooms)
+	fmt.Println(room)
+	if contains(itemID, room.items) {
+		return true
+	}
+	return false
+}
+
+func contains(itemID string, items []Item) bool {
+	for _, item := range items {
+		if itemID == item.name {
+			return true
+		}
+	}
+	return false
+}
+
+func removeItemFromInventory(itemToRemove Item, items []Item) []Item {
+	var updatedItems []Item
 	// fmt.Printf("looking for: %v\n", itemToRemove.Name)
 	for _, item := range items {
 		// fmt.Printf("looked at %v\n", item.Name)
-		if item.Name != itemToRemove.Name {
-			newItems = append(newItems, item)
-		} else if item.Name == itemToRemove.Name && item.Amount > 1 {
-			item.Amount = item.Amount - 1
-			newItems = append(newItems, item)
+		if item.name != itemToRemove.name {
+			updatedItems = append(updatedItems, item)
+		} else if item.name == itemToRemove.name && item.amount > itemToRemove.amount {
+			item.amount = item.amount - itemToRemove.amount
+			updatedItems = append(updatedItems, item)
 		}
 	}
 
-	return newItems
-
+	return updatedItems
 }
 
-func findItemByID(id string, state State) (Item, error) {
-	for _, item := range state.items {
-		for _, alias := range item.Aliases {
+func findItemByID(id string, state State) (ItemDefinition, error) {
+	for _, item := range state.itemsDefinitions {
+		for _, alias := range item.aliases {
 			if id == alias {
 				return item, nil
 			}
 		}
 	}
 
-	return Item{Name: "none"}, errors.New("No Item Found")
+	return ItemDefinition{name: "none"}, errors.New("No Item Found")
 }
